@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"net/http"
@@ -11,8 +11,10 @@ import (
 func Handler(w http.ResponseWriter, r *http.Request) {
 	rtr := mux.NewRouter()
 
+	// Public
 	rtr.HandleFunc("/api/login", handlers.Login).Methods("POST")
 
+	// Protected
 	s := rtr.PathPrefix("/api/spareparts").Subrouter()
 	s.Use(middleware.JWTMiddleware)
 	s.HandleFunc("", handlers.GetSpareparts).Methods("GET")
@@ -22,7 +24,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	s.HandleFunc("/{id}", handlers.DeleteSparepart).Methods("DELETE")
 
 	rtr.Use(enableCORS)
-
 	rtr.ServeHTTP(w, r)
 }
 
